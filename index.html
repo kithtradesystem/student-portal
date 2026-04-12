@@ -308,4 +308,18 @@
       if (res.ok) {
         showStatus('✅ Chart submitted! Your instructor will review it shortly.', true);
         btn.textContent = '✅ Submitted!';
-        setTimeout(() => { btn.disabled = false; btn.textContent = '📤 Submit for Review'; }, 3000)
+        setTimeout(() => { btn.disabled = false; btn.textContent = '📤 Submit for Review'; }, 3000);
+      } else {
+        showStatus('❌ Failed to submit. Please try again.', false);
+        btn.disabled = false; btn.textContent = '📤 Submit for Review';
+      }
+    } catch(e) {
+      showStatus('❌ Failed to submit. Check your connection.', false);
+      btn.disabled = false; btn.textContent = '📤 Submit for Review';
+    }
+  }
+
+  function showStatus(msg, ok) { const el = document.getElementById('status-msg'); el.textContent = msg; el.className = 'status-msg ' + (ok ? 'status-ok' : 'status-err'); }
+</script>
+</body>
+</html>
