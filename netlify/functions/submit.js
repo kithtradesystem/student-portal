@@ -55,6 +55,11 @@ ${data.mas || 'None'}
 **📖 What I See**
 ${data.analysis || '—'}
 
+**🧠 Mental Note**
+> 😶 Mood: ${data.mood || '—'}
+> 📊 Confidence: ${data.scale || '—'}
+> 💭 Thoughts: ${data.mentalNote || '—'}
+
 ${data.chartLink ? `**📈 Chart:** [View on TradingView](${data.chartLink})` : ''}`,
             color: data.bias === 'BULLISH' ? 3866394 : 15548997,
             footer: { text: `KithTradeLab · Student Submission · ${timestamp} EST` }
