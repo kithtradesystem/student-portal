@@ -131,7 +131,7 @@
     <!-- PRIMARY ZONE -->
     <div class="section">
       <div class="section-label">Primary Zone</div>
-      <div class="row row-2" style="margin-bottom:12px">
+      <div class="row row-2">
         <div class="field"><label>Zone Type</label><select id="primary-zone"><option>Supply Zone</option><option>Demand Zone</option><option>Imbalance</option><option>Support</option><option>Resistance</option><option>Trendline</option></select></div>
         <div class="field"><label>Zone Range</label><input type="text" id="zone-range" placeholder="e.g. 19,420 – 19,480" /></div>
       </div>
@@ -142,12 +142,13 @@
       <div class="section-label">Trade Idea</div>
       <div class="row row-3" style="margin-bottom:12px">
         <div class="field"><label>Entry Price</label><input type="number" id="entry" placeholder="e.g. 19450" oninput="calcRR()" /></div>
-        <div class="field"><label>Take Profit</label><input type="number" id="tp" placeholder="e.g. 19150" oninput="calcRR()" /></div>
         <div class="field"><label>Stop Loss</label><input type="number" id="sl" placeholder="e.g. 19520" oninput="calcRR()" /></div>
+        <div class="field"><label>Est. RR Ratio</label><div class="rr-display" id="rr-display">— enter prices</div></div>
       </div>
-      <div class="field">
-        <label>Est. RR Ratio</label>
-        <div class="rr-display" id="rr-display">— enter prices above</div>
+      <div class="row row-3">
+        <div class="field"><label>Take Profit 1</label><input type="number" id="tp1" placeholder="e.g. 19300" oninput="calcRR()" /></div>
+        <div class="field"><label>Take Profit 2</label><input type="number" id="tp2" placeholder="e.g. 19150" /></div>
+        <div class="field"><label>Take Profit 3 (optional)</label><input type="number" id="tp3" placeholder="e.g. 19000" /></div>
       </div>
     </div>
 
@@ -257,11 +258,11 @@
   let calculatedRR = '—';
   function calcRR() {
     const entry = parseFloat(document.getElementById('entry').value);
-    const tp = parseFloat(document.getElementById('tp').value);
-    const sl = parseFloat(document.getElementById('sl').value);
-    const el = document.getElementById('rr-display');
-    if (!entry || !tp || !sl) { el.textContent = '— enter prices above'; el.className = 'rr-display'; calculatedRR = '—'; return; }
-    const reward = Math.abs(tp - entry); const risk = Math.abs(sl - entry);
+    const tp1   = parseFloat(document.getElementById('tp1').value);
+    const sl    = parseFloat(document.getElementById('sl').value);
+    const el    = document.getElementById('rr-display');
+    if (!entry || !tp1 || !sl) { el.textContent = '— enter prices'; el.className = 'rr-display'; calculatedRR = '—'; return; }
+    const reward = Math.abs(tp1 - entry); const risk = Math.abs(sl - entry);
     if (risk === 0) { el.textContent = 'Invalid'; el.className = 'rr-display bad'; calculatedRR = '—'; return; }
     const ratio = (reward / risk).toFixed(1); calculatedRR = '~1:'+ratio; el.textContent = '~1:'+ratio;
     if (ratio >= 3) { el.className = 'rr-display good'; } else if (ratio >= 2) { el.className = 'rr-display ok'; } else { el.className = 'rr-display bad'; }
@@ -271,16 +272,18 @@
     const username = document.getElementById('username').value.trim();
     if (!username) { showStatus('Please enter your Discord username.', false); return; }
 
-    const symbol     = document.getElementById('symbol').value;
-    const timeframe  = document.getElementById('timeframe').value;
-    const type       = document.getElementById('type').value;
+    const symbol      = document.getElementById('symbol').value;
+    const timeframe   = document.getElementById('timeframe').value;
+    const type        = document.getElementById('type').value;
     const primaryZone = document.getElementById('primary-zone').value;
-    const zoneRange  = document.getElementById('zone-range').value || '—';
-    const entry      = document.getElementById('entry').value || '—';
-    const tp         = document.getElementById('tp').value || '—';
-    const sl         = document.getElementById('sl').value || '—';
-    const analysis   = document.getElementById('analysis').value || '—';
-    const chartLink  = document.getElementById('chart-link').value.trim();
+    const zoneRange   = document.getElementById('zone-range').value || '—';
+    const entry       = document.getElementById('entry').value || '—';
+    const sl          = document.getElementById('sl').value || '—';
+    const tp1         = document.getElementById('tp1').value || '—';
+    const tp2         = document.getElementById('tp2').value || '—';
+    const tp3         = document.getElementById('tp3').value || '';
+    const analysis    = document.getElementById('analysis').value || '—';
+    const chartLink   = document.getElementById('chart-link').value.trim();
 
     const btn = document.querySelector('.submit-btn');
     btn.disabled = true; btn.textContent = 'Submitting...';
@@ -293,7 +296,7 @@
           username, symbol, timeframe, type,
           bias: currentBias,
           primaryZone, zoneRange,
-          entry, tp, sl,
+          entry, sl, tp1, tp2, tp3,
           rr: calculatedRR,
           confluences: buildConfluences(),
           fib: buildFibString(),
@@ -303,20 +306,6 @@
       });
 
       if (res.ok) {
-        showStatus('✅ Chart submitted successfully! Your instructor will review it shortly.', true);
+        showStatus('✅ Chart submitted! Your instructor will review it shortly.', true);
         btn.textContent = '✅ Submitted!';
-        setTimeout(() => { btn.disabled = false; btn.textContent = '📤 Submit for Review'; }, 3000);
-      } else {
-        showStatus('❌ Failed to submit. Please try again.', false);
-        btn.disabled = false; btn.textContent = '📤 Submit for Review';
-      }
-    } catch(e) {
-      showStatus('❌ Failed to submit. Check your connection.', false);
-      btn.disabled = false; btn.textContent = '📤 Submit for Review';
-    }
-  }
-
-  function showStatus(msg, ok) { const el = document.getElementById('status-msg'); el.textContent = msg; el.className = 'status-msg ' + (ok ? 'status-ok' : 'status-err'); }
-</script>
-</body>
-</html>
+        setTimeout(() => { btn.disabled = false; btn.textContent = '📤 Submit for Review'; }, 3000)
