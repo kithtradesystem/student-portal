@@ -16,18 +16,21 @@ exports.handler = async function(event) {
       year: 'numeric', hour: '2-digit', minute: '2-digit'
     });
 
-    // Step 1 — Create thread with a message inside it
-    const threadRes = await fetch(`https://discord.com/api/v10/channels/${channelId}/messages`, {
+    // Forum channels use threads endpoint directly
+    const forumRes = await fetch(`https://discord.com/api/v10/channels/${channelId}/threads`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bot ${botToken}`
       },
       body: JSON.stringify({
-        content: `📊 New chart submission from **${data.username}**`,
-        embeds: [{
-          title: `📊 ${data.symbol} | ${data.timeframe} | ${data.type}`,
-          description:
+        name: threadName,
+        auto_archive_duration: 1440,
+        message: {
+          content: `📊 New chart submission from **${data.username}**`,
+          embeds: [{
+            title: `📊 ${data.symbol} | ${data.timeframe} | ${data.type}`,
+            description:
 `👤 **Student:** ${data.username}
 ${data.bias === 'BULLISH' ? '🟢' : '🔴'} **${data.bias} BIAS**
 
@@ -51,37 +54,17 @@ ${data.mas || 'None'}
 ${data.analysis || '—'}
 
 ${data.chartLink ? `**📈 Chart:** [View on TradingView](${data.chartLink})` : ''}`,
-          color: data.bias === 'BULLISH' ? 3866394 : 15548997,
-          footer: { text: `KithTradeLab · Student Submission · ${timestamp} EST` }
-        }]
+            color: data.bias === 'BULLISH' ? 3866394 : 15548997,
+            footer: { text: `KithTradeLab · Student Submission · ${timestamp} EST` }
+          }]
+        }
       })
     });
 
-    if (!threadRes.ok) {
-      const err = await threadRes.text();
-      console.error('Message error:', err);
-      return { statusCode: 500, body: 'Failed to post message' };
-    }
-
-    const msg = await threadRes.json();
-
-    // Step 2 — Create thread from that message
-    const createThread = await fetch(`https://discord.com/api/v10/channels/${channelId}/messages/${msg.id}/threads`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bot ${botToken}`
-      },
-      body: JSON.stringify({
-        name: threadName,
-        auto_archive_duration: 1440
-      })
-    });
-
-    if (!createThread.ok) {
-      const err = await createThread.text();
-      console.error('Thread error:', err);
-      return { statusCode: 500, body: 'Failed to create thread' };
+    if (!forumRes.ok) {
+      const err = await forumRes.text();
+      console.error('Forum error:', err);
+      return { statusCode: 500, body: 'Failed to post to forum' };
     }
 
     return {
