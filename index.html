@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KithTradeLab — Chart Review</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0b0d; --surface: #111318; --border: #1e2229; --border-hover: #2a3040;
+    --accent: #f0b429; --accent-dim: rgba(240,180,41,0.1);
+    --green: #22c55e; --green-dim: rgba(34,197,94,0.1);
+    --red: #ef4444; --red-dim: rgba(239,68,68,0.1);
+    --blue: #3b82f6; --blue-dim: rgba(59,130,246,0.1);
+    --purple: #a855f7; --purple-dim: rgba(168,85,247,0.1);
+    --text: #e8eaf0; --muted: #4a5568;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; }
+  #login-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; position: relative; }
+  #login-screen::before { content: ''; position: absolute; width: 600px; height: 600px; background: radial-gradient(circle, rgba(240,180,41,0.05) 0%, transparent 70%); top: 50%; left: 50%; transform: translate(-50%,-50%); pointer-events: none; }
+  .login-box { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 48px 40px; width: 100%; max-width: 380px; text-align: center; }
+  .login-logo { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--accent); letter-spacing: 4px; text-transform: uppercase; margin-bottom: 8px; }
+  .login-title { font-size: 22px; font-weight: 600; margin-bottom: 6px; }
+  .login-sub { font-size: 13px; color: var(--muted); margin-bottom: 32px; }
+  .login-input { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; color: var(--text); font-family: 'Space Mono', monospace; font-size: 14px; letter-spacing: 4px; text-align: center; outline: none; margin-bottom: 16px; transition: border-color 0.2s; }
+  .login-input:focus { border-color: var(--accent); }
+  .login-btn { width: 100%; background: var(--accent); color: #000; border: none; border-radius: 8px; padding: 12px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: opacity 0.2s; }
+  .login-btn:hover { opacity: 0.9; }
+  .login-error { color: var(--red); font-size: 12px; margin-top: 10px; display: none; }
+  #app { display: none; }
+  .topbar { border-bottom: 1px solid var(--border); padding: 0 32px; display: flex; align-items: center; justify-content: space-between; background: var(--surface); position: sticky; top: 0; z-index: 10; height: 56px; }
+  .topbar-brand { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--accent); letter-spacing: 3px; text-transform: uppercase; }
+  .topbar-right { font-size: 11px; color: var(--muted); font-family: 'Space Mono', monospace; }
+  .main { max-width: 760px; margin: 0 auto; padding: 40px 24px 80px; }
+  .page-title { font-size: 28px; font-weight: 600; margin-bottom: 4px; }
+  .page-sub { font-size: 14px; color: var(--muted); margin-bottom: 36px; }
+  .section { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 16px; }
+  .section-label { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--accent); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .row { display: grid; gap: 12px; margin-bottom: 12px; }
+  .row-2 { grid-template-columns: 1fr 1fr; }
+  .row-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .row-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  label { font-size: 11px; color: var(--muted); font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase; }
+  input, select, textarea { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; outline: none; transition: border-color 0.2s; width: 100%; }
+  input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+  select option { background: var(--surface); }
+  textarea { resize: vertical; min-height: 80px; line-height: 1.6; }
+  .bias-toggle { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .bias-btn { padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; text-align: center; }
+  .bias-btn.bull.active { background: var(--green-dim); border-color: var(--green); color: var(--green); }
+  .bias-btn.bear.active { background: var(--red-dim); border-color: var(--red); color: var(--red); }
+  .conf-block { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 14px; margin-bottom: 10px; }
+  .conf-block:last-child { margin-bottom: 0; }
+  .conf-num { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--accent); letter-spacing: 2px; margin-bottom: 10px; }
+  .ma-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; }
+  .ma-btn { padding: 10px 8px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; text-align: center; }
+  .ma-btn.ema-active { border-color: var(--accent); background: var(--accent-dim); color: var(--accent); }
+  .ma-btn.sma-active { border-color: var(--blue); background: var(--blue-dim); color: var(--blue); }
+  .rr-display { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; font-family: 'Space Mono', monospace; font-size: 16px; font-weight: 700; color: var(--accent); text-align: center; min-height: 44px; display: flex; align-items: center; justify-content: center; }
+  .rr-display.good { border-color: var(--green); color: var(--green); }
+  .rr-display.ok { border-color: var(--accent); color: var(--accent); }
+  .rr-display.bad { border-color: var(--red); color: var(--red); }
+  .timestamp-bar { background: var(--accent-dim); border: 1px solid rgba(240,180,41,0.2); border-radius: 8px; padding: 10px 14px; font-family: 'Space Mono', monospace; font-size: 11px; color: var(--accent); margin-bottom: 16px; }
+  .submit-btn { width: 100%; background: var(--accent); color: #000; border: none; border-radius: 10px; padding: 16px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; transition: opacity 0.2s, transform 0.1s; margin-top: 8px; }
+  .submit-btn:hover { opacity: 0.92; }
+  .submit-btn:active { transform: scale(0.99); }
+  .submit-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .status-msg { text-align: center; font-size: 13px; margin-top: 12px; min-height: 20px; font-weight: 500; }
+  .status-ok { color: var(--green); }
+  .status-err { color: var(--red); }
+  .portal-footer { text-align: center; padding: 16px; font-size: 10px; color: var(--muted); border-top: 1px solid var(--border); margin-top: 40px; }
+  @media (max-width: 600px) {
+    .row-3, .row-4, .ma-grid { grid-template-columns: 1fr 1fr; }
+    .row-2 { grid-template-columns: 1fr; }
+    .topbar { padding: 0 16px; }
+    .main { padding: 24px 16px 60px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">KithTradeLab</div>
+    <div class="login-title">Chart Review</div>
+    <div class="login-sub">Enter your access code to submit your chart</div>
+    <input type="password" class="login-input" id="pw-input" placeholder="••••••••" />
+    <button class="login-btn" onclick="checkPassword()">Access Portal</button>
+    <div class="login-error" id="pw-error">Incorrect access code. Try again.</div>
+  </div>
+</div>
+
+<div id="app">
+  <div class="topbar">
+    <div class="topbar-brand">KithTradeLab · Chart Review</div>
+    <div class="topbar-right" id="clock"></div>
+  </div>
+  <div class="main">
+    <div class="page-title">Submit Your Chart</div>
+    <div class="page-sub">Fill out your analysis — your instructor will review it in Discord.</div>
+    <div class="timestamp-bar">🕐 <span id="ts-display"></span> EST</div>
+
+    <!-- STUDENT INFO -->
+    <div class="section">
+      <div class="section-label">Your Info</div>
+      <div class="field">
+        <label>Discord Username</label>
+        <input type="text" id="username" placeholder="e.g. kith.trades" />
+      </div>
+    </div>
+
+    <!-- SETUP INFO -->
+    <div class="section">
+      <div class="section-label">Setup Info</div>
+      <div class="row row-4">
+        <div class="field"><label>Symbol</label><select id="symbol"><option>NQ</option><option>ES</option><option>CL</option><option>GC</option></select></div>
+        <div class="field"><label>Timeframe</label><select id="timeframe"><option>2M</option><option>5M</option><option>30M</option><option>1H</option><option>4H</option><option>Daily</option></select></div>
+        <div class="field"><label>Type</label><select id="type"><option>LONG</option><option>SHORT</option></select></div>
+        <div class="field"><label>Bias</label>
+          <div class="bias-toggle" style="margin-top:2px">
+            <button class="bias-btn bull active" id="bull-btn" onclick="setBias('BULLISH')">🟢 Bull</button>
+            <button class="bias-btn bear" id="bear-btn" onclick="setBias('BEARISH')">🔴 Bear</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRIMARY ZONE -->
+    <div class="section">
+      <div class="section-label">Primary Zone</div>
+      <div class="row row-2" style="margin-bottom:12px">
+        <div class="field"><label>Zone Type</label><select id="primary-zone"><option>Supply Zone</option><option>Demand Zone</option><option>Imbalance</option><option>Support</option><option>Resistance</option><option>Trendline</option></select></div>
+        <div class="field"><label>Zone Range</label><input type="text" id="zone-range" placeholder="e.g. 19,420 – 19,480" /></div>
+      </div>
+    </div>
+
+    <!-- TRADE IDEA -->
+    <div class="section">
+      <div class="section-label">Trade Idea</div>
+      <div class="row row-3" style="margin-bottom:12px">
+        <div class="field"><label>Entry Price</label><input type="number" id="entry" placeholder="e.g. 19450" oninput="calcRR()" /></div>
+        <div class="field"><label>Take Profit</label><input type="number" id="tp" placeholder="e.g. 19150" oninput="calcRR()" /></div>
+        <div class="field"><label>Stop Loss</label><input type="number" id="sl" placeholder="e.g. 19520" oninput="calcRR()" /></div>
+      </div>
+      <div class="field">
+        <label>Est. RR Ratio</label>
+        <div class="rr-display" id="rr-display">— enter prices above</div>
+      </div>
+    </div>
+
+    <!-- CONFLUENCES -->
+    <div class="section">
+      <div class="section-label">Confluences</div>
+      <div class="conf-block">
+        <div class="conf-num">CONFLUENCE 1</div>
+        <div class="row row-2">
+          <div class="field"><label>Zone / Level</label><select id="conf1-zone"><option>—</option><option>Supply Zone</option><option>Demand Zone</option><option>Imbalance</option><option>Support</option><option>Resistance</option><option>Trendline</option></select></div>
+          <div class="field"><label>Note</label><input type="text" id="conf1-note" placeholder="describe the confluence" /></div>
+        </div>
+      </div>
+      <div class="conf-block">
+        <div class="conf-num">CONFLUENCE 2</div>
+        <div class="row row-2">
+          <div class="field"><label>Zone / Level</label><select id="conf2-zone"><option>—</option><option>Supply Zone</option><option>Demand Zone</option><option>Imbalance</option><option>Support</option><option>Resistance</option><option>Trendline</option></select></div>
+          <div class="field"><label>Note</label><input type="text" id="conf2-note" placeholder="optional" /></div>
+        </div>
+      </div>
+      <div class="conf-block">
+        <div class="conf-num">CONFLUENCE 3</div>
+        <div class="row row-2">
+          <div class="field"><label>Zone / Level</label><select id="conf3-zone"><option>—</option><option>Supply Zone</option><option>Demand Zone</option><option>Imbalance</option><option>Support</option><option>Resistance</option><option>Trendline</option></select></div>
+          <div class="field"><label>Note</label><input type="text" id="conf3-note" placeholder="optional" /></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FIB -->
+    <div class="section">
+      <div class="section-label">Fib Level</div>
+      <div class="row row-2">
+        <div class="field"><label>Fib Level</label><select id="fib-level"><option>None</option><option>0.236</option><option>0.382</option><option>0.5</option><option>0.618</option><option>0.705</option><option>0.786</option><option>0.79</option><option>0.88</option></select></div>
+        <div class="field"><label>Drawn on Timeframe</label><select id="fib-tf"><option>—</option><option>2M</option><option>5M</option><option>30M</option><option>1H</option><option>4H</option><option>Daily</option></select></div>
+      </div>
+    </div>
+
+    <!-- MOVING AVERAGES -->
+    <div class="section">
+      <div class="section-label">Moving Averages</div>
+      <div class="ma-grid">
+        <button class="ma-btn" id="ma-ema9" onclick="toggleMA('ema9','ema')">EMA 9</button>
+        <button class="ma-btn" id="ma-ema21" onclick="toggleMA('ema21','ema')">EMA 21</button>
+        <button class="ma-btn" id="ma-sma50" onclick="toggleMA('sma50','sma')">SMA 50</button>
+        <button class="ma-btn" id="ma-sma200" onclick="toggleMA('sma200','sma')">SMA 200</button>
+      </div>
+    </div>
+
+    <!-- ANALYSIS -->
+    <div class="section">
+      <div class="section-label">Your Analysis</div>
+      <div class="field">
+        <label>📖 What Do You See — Explain Your Chart</label>
+        <textarea id="analysis" placeholder="Describe what you see on your chart — price action, structure, why you chose this zone, what you are waiting for..."></textarea>
+      </div>
+    </div>
+
+    <!-- CHART -->
+    <div class="section">
+      <div class="section-label">Your Chart</div>
+      <div class="field">
+        <label>📈 TradingView Chart Link</label>
+        <input type="text" id="chart-link" placeholder="https://www.tradingview.com/x/..." />
+      </div>
+    </div>
+
+    <button class="submit-btn" onclick="submitChart()">📤 Submit for Review</button>
+    <div class="status-msg" id="status-msg"></div>
+    <div class="portal-footer">KithTradeLab · Chart Review Portal · Educational Only</div>
+  </div>
+</div>
+
+<script>
+  const ACCESS_CODE = "Student1";
+
+  function checkPassword() {
+    if (document.getElementById('pw-input').value === ACCESS_CODE) {
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('app').style.display = 'block';
+      startClock();
+    } else {
+      document.getElementById('pw-error').style.display = 'block';
+      document.getElementById('pw-input').value = '';
+    }
+  }
+  document.getElementById('pw-input').addEventListener('keydown', e => { if (e.key === 'Enter') checkPassword(); });
+
+  function getEST() { return new Date().toLocaleString('en-US', { timeZone: 'America/New_York', weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }); }
+  function startClock() { function tick() { const t = getEST(); document.getElementById('clock').textContent = t + ' EST'; document.getElementById('ts-display').textContent = t; } tick(); setInterval(tick, 1000); }
+
+  let currentBias = 'BULLISH';
+  function setBias(b) { currentBias = b; document.getElementById('bull-btn').classList.toggle('active', b === 'BULLISH'); document.getElementById('bear-btn').classList.toggle('active', b === 'BEARISH'); }
+
+  let activeMA = new Set();
+  function toggleMA(ma, type) { const btn = document.getElementById('ma-'+ma); const cls = type === 'ema' ? 'ema-active' : 'sma-active'; if (activeMA.has(ma)) { activeMA.delete(ma); btn.classList.remove(cls); } else { activeMA.add(ma); btn.classList.add(cls); } }
+  function buildMAString() { const labels = { ema9: 'EMA 9', ema21: 'EMA 21', sma50: 'SMA 50', sma200: 'SMA 200' }; return [...activeMA].map(m => labels[m]).join(' · ') || 'None'; }
+
+  function buildConfluences() {
+    const nums = ['①','②','③']; const confs = [];
+    for (let i = 1; i <= 3; i++) { const zone = document.getElementById('conf'+i+'-zone').value; const note = document.getElementById('conf'+i+'-note').value; if (zone !== '—') { let line = nums[i-1]+' '+zone; if (note) line += ' — '+note; confs.push(line); } }
+    return confs.length > 0 ? confs.join('\n') : '—';
+  }
+
+  function buildFibString() { const level = document.getElementById('fib-level').value; const tf = document.getElementById('fib-tf').value; if (level === 'None') return 'None'; return tf !== '—' ? level+' — drawn on '+tf : level; }
+
+  let calculatedRR = '—';
+  function calcRR() {
+    const entry = parseFloat(document.getElementById('entry').value);
+    const tp = parseFloat(document.getElementById('tp').value);
+    const sl = parseFloat(document.getElementById('sl').value);
+    const el = document.getElementById('rr-display');
+    if (!entry || !tp || !sl) { el.textContent = '— enter prices above'; el.className = 'rr-display'; calculatedRR = '—'; return; }
+    const reward = Math.abs(tp - entry); const risk = Math.abs(sl - entry);
+    if (risk === 0) { el.textContent = 'Invalid'; el.className = 'rr-display bad'; calculatedRR = '—'; return; }
+    const ratio = (reward / risk).toFixed(1); calculatedRR = '~1:'+ratio; el.textContent = '~1:'+ratio;
+    if (ratio >= 3) { el.className = 'rr-display good'; } else if (ratio >= 2) { el.className = 'rr-display ok'; } else { el.className = 'rr-display bad'; }
+  }
+
+  async function submitChart() {
+    const username = document.getElementById('username').value.trim();
+    if (!username) { showStatus('Please enter your Discord username.', false); return; }
+
+    const symbol     = document.getElementById('symbol').value;
+    const timeframe  = document.getElementById('timeframe').value;
+    const type       = document.getElementById('type').value;
+    const primaryZone = document.getElementById('primary-zone').value;
+    const zoneRange  = document.getElementById('zone-range').value || '—';
+    const entry      = document.getElementById('entry').value || '—';
+    const tp         = document.getElementById('tp').value || '—';
+    const sl         = document.getElementById('sl').value || '—';
+    const analysis   = document.getElementById('analysis').value || '—';
+    const chartLink  = document.getElementById('chart-link').value.trim();
+
+    const btn = document.querySelector('.submit-btn');
+    btn.disabled = true; btn.textContent = 'Submitting...';
+
+    try {
+      const res = await fetch('/.netlify/functions/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username, symbol, timeframe, type,
+          bias: currentBias,
+          primaryZone, zoneRange,
+          entry, tp, sl,
+          rr: calculatedRR,
+          confluences: buildConfluences(),
+          fib: buildFibString(),
+          mas: buildMAString(),
+          analysis, chartLink
+        })
+      });
+
+      if (res.ok) {
+        showStatus('✅ Chart submitted successfully! Your instructor will review it shortly.', true);
+        btn.textContent = '✅ Submitted!';
+        setTimeout(() => { btn.disabled = false; btn.textContent = '📤 Submit for Review'; }, 3000);
+      } else {
+        showStatus('❌ Failed to submit. Please try again.', false);
+        btn.disabled = false; btn.textContent = '📤 Submit for Review';
+      }
+    } catch(e) {
+      showStatus('❌ Failed to submit. Check your connection.', false);
+      btn.disabled = false; btn.textContent = '📤 Submit for Review';
+    }
+  }
+
+  function showStatus(msg, ok) { const el = document.getElementById('status-msg'); el.textContent = msg; el.className = 'status-msg ' + (ok ? 'status-ok' : 'status-err'); }
+</script>
+</body>
+</html>
