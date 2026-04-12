@@ -64,6 +64,13 @@
   .rr-display.ok { border-color: var(--accent); color: var(--accent); }
   .rr-display.bad { border-color: var(--red); color: var(--red); }
   .timestamp-bar { background: var(--accent-dim); border: 1px solid rgba(240,180,41,0.2); border-radius: 8px; padding: 10px 14px; font-family: 'Space Mono', monospace; font-size: 11px; color: var(--accent); margin-bottom: 16px; }
+  .mood-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 12px; }
+  .mood-btn { padding: 10px 6px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.2s; text-align: center; }
+  .mood-btn.active { border-color: var(--purple); background: var(--purple-dim); color: var(--purple); }
+  .scale-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 6px; }
+  .scale-btn { padding: 10px 4px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--muted); font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s; text-align: center; }
+  .scale-btn.active { border-color: var(--accent); background: var(--accent-dim); color: var(--accent); }
+  .section-divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
   .submit-btn { width: 100%; background: var(--accent); color: #000; border: none; border-radius: 10px; padding: 16px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; transition: opacity 0.2s, transform 0.1s; margin-top: 8px; }
   .submit-btn:hover { opacity: 0.92; }
   .submit-btn:active { transform: scale(0.99); }
@@ -75,6 +82,8 @@
   @media (max-width: 600px) {
     .row-3, .row-4, .ma-grid { grid-template-columns: 1fr 1fr; }
     .row-2 { grid-template-columns: 1fr; }
+    .mood-grid { grid-template-columns: repeat(3, 1fr); }
+    .scale-grid { grid-template-columns: repeat(5, 1fr); }
     .topbar { padding: 0 16px; }
     .main { padding: 24px 16px 60px; }
   }
@@ -158,21 +167,42 @@
       <div class="conf-block">
         <div class="conf-num">CONFLUENCE 1</div>
         <div class="row row-2">
-          <div class="field"><label>Zone / Level</label><select id="conf1-zone"><option>—</option><option>Supply Zone</option><option>Demand Zone</option><option>Imbalance</option><option>Support</option><option>Resistance</option><option>Trendline</option></select></div>
+          <div class="field"><label>Zone / Level</label>
+            <select id="conf1-zone">
+              <option>—</option><option>Supply Zone</option><option>Demand Zone</option>
+              <option>Imbalance</option><option>Support</option><option>Resistance</option>
+              <option>Trendline</option><option>EMA</option><option>SMA</option>
+              <option>VWAP</option><option>Market Structure</option><option>Liquidity Sweep</option>
+            </select>
+          </div>
           <div class="field"><label>Note</label><input type="text" id="conf1-note" placeholder="describe the confluence" /></div>
         </div>
       </div>
       <div class="conf-block">
         <div class="conf-num">CONFLUENCE 2</div>
         <div class="row row-2">
-          <div class="field"><label>Zone / Level</label><select id="conf2-zone"><option>—</option><option>Supply Zone</option><option>Demand Zone</option><option>Imbalance</option><option>Support</option><option>Resistance</option><option>Trendline</option></select></div>
+          <div class="field"><label>Zone / Level</label>
+            <select id="conf2-zone">
+              <option>—</option><option>Supply Zone</option><option>Demand Zone</option>
+              <option>Imbalance</option><option>Support</option><option>Resistance</option>
+              <option>Trendline</option><option>EMA</option><option>SMA</option>
+              <option>VWAP</option><option>Market Structure</option><option>Liquidity Sweep</option>
+            </select>
+          </div>
           <div class="field"><label>Note</label><input type="text" id="conf2-note" placeholder="optional" /></div>
         </div>
       </div>
       <div class="conf-block">
         <div class="conf-num">CONFLUENCE 3</div>
         <div class="row row-2">
-          <div class="field"><label>Zone / Level</label><select id="conf3-zone"><option>—</option><option>Supply Zone</option><option>Demand Zone</option><option>Imbalance</option><option>Support</option><option>Resistance</option><option>Trendline</option></select></div>
+          <div class="field"><label>Zone / Level</label>
+            <select id="conf3-zone">
+              <option>—</option><option>Supply Zone</option><option>Demand Zone</option>
+              <option>Imbalance</option><option>Support</option><option>Resistance</option>
+              <option>Trendline</option><option>EMA</option><option>SMA</option>
+              <option>VWAP</option><option>Market Structure</option><option>Liquidity Sweep</option>
+            </select>
+          </div>
           <div class="field"><label>Note</label><input type="text" id="conf3-note" placeholder="optional" /></div>
         </div>
       </div>
@@ -198,12 +228,48 @@
       </div>
     </div>
 
-    <!-- ANALYSIS -->
+    <!-- ANALYSIS + MENTAL NOTE -->
     <div class="section">
       <div class="section-label">Your Analysis</div>
       <div class="field">
         <label>📖 What Do You See — Explain Your Chart</label>
         <textarea id="analysis" placeholder="Describe what you see on your chart — price action, structure, why you chose this zone, what you are waiting for..."></textarea>
+      </div>
+
+      <hr class="section-divider">
+
+      <div class="section-label" style="margin-top:16px">Mental Note</div>
+
+      <div class="field" style="margin-bottom:12px">
+        <label>How are you feeling right now?</label>
+        <div class="mood-grid">
+          <button class="mood-btn" id="mood-frustrated" onclick="setMood('frustrated')">😤 Frustrated</button>
+          <button class="mood-btn" id="mood-anxious" onclick="setMood('anxious')">😟 Anxious</button>
+          <button class="mood-btn" id="mood-neutral" onclick="setMood('neutral')">😐 Neutral</button>
+          <button class="mood-btn" id="mood-confident" onclick="setMood('confident')">😊 Confident</button>
+          <button class="mood-btn" id="mood-focused" onclick="setMood('focused')">🔥 Focused</button>
+        </div>
+      </div>
+
+      <div class="field" style="margin-bottom:12px">
+        <label>Confidence Scale — 1 to 10</label>
+        <div class="scale-grid">
+          <button class="scale-btn" id="scale-1" onclick="setScale(1)">1</button>
+          <button class="scale-btn" id="scale-2" onclick="setScale(2)">2</button>
+          <button class="scale-btn" id="scale-3" onclick="setScale(3)">3</button>
+          <button class="scale-btn" id="scale-4" onclick="setScale(4)">4</button>
+          <button class="scale-btn" id="scale-5" onclick="setScale(5)">5</button>
+          <button class="scale-btn" id="scale-6" onclick="setScale(6)">6</button>
+          <button class="scale-btn" id="scale-7" onclick="setScale(7)">7</button>
+          <button class="scale-btn" id="scale-8" onclick="setScale(8)">8</button>
+          <button class="scale-btn" id="scale-9" onclick="setScale(9)">9</button>
+          <button class="scale-btn" id="scale-10" onclick="setScale(10)">10</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Additional Thoughts</label>
+        <textarea id="mental-note" placeholder="e.g. I feel hesitant because of news today, or I'm very confident in this setup..."></textarea>
       </div>
     </div>
 
@@ -268,6 +334,23 @@
     if (ratio >= 3) { el.className = 'rr-display good'; } else if (ratio >= 2) { el.className = 'rr-display ok'; } else { el.className = 'rr-display bad'; }
   }
 
+  const moods = { frustrated: '😤 Frustrated', anxious: '😟 Anxious', neutral: '😐 Neutral', confident: '😊 Confident', focused: '🔥 Focused' };
+  let currentMood = null;
+  function setMood(m) {
+    Object.keys(moods).forEach(k => document.getElementById('mood-'+k).classList.remove('active'));
+    if (currentMood === m) { currentMood = null; return; }
+    currentMood = m;
+    document.getElementById('mood-'+m).classList.add('active');
+  }
+
+  let currentScale = null;
+  function setScale(n) {
+    for (let i = 1; i <= 10; i++) document.getElementById('scale-'+i).classList.remove('active');
+    if (currentScale === n) { currentScale = null; return; }
+    currentScale = n;
+    document.getElementById('scale-'+n).classList.add('active');
+  }
+
   async function submitChart() {
     const username = document.getElementById('username').value.trim();
     if (!username) { showStatus('Please enter your Discord username.', false); return; }
@@ -283,6 +366,7 @@
     const tp2         = document.getElementById('tp2').value || '—';
     const tp3         = document.getElementById('tp3').value || '';
     const analysis    = document.getElementById('analysis').value || '—';
+    const mentalNote  = document.getElementById('mental-note').value || '—';
     const chartLink   = document.getElementById('chart-link').value.trim();
 
     const btn = document.querySelector('.submit-btn');
@@ -301,7 +385,10 @@
           confluences: buildConfluences(),
           fib: buildFibString(),
           mas: buildMAString(),
-          analysis, chartLink
+          analysis, chartLink,
+          mood: currentMood ? moods[currentMood] : '—',
+          scale: currentScale ? `${currentScale}/10` : '—',
+          mentalNote
         })
       });
 
