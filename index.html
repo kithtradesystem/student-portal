@@ -13,6 +13,7 @@
     --red: #ef4444; --red-dim: rgba(239,68,68,0.1);
     --blue: #3b82f6; --blue-dim: rgba(59,130,246,0.1);
     --purple: #a855f7; --purple-dim: rgba(168,85,247,0.1);
+    --amber: #f59e0b; --amber-dim: rgba(245,158,11,0.1);
     --text: #e8eaf0; --muted: #4a5568;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -38,6 +39,7 @@
   .section { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 16px; }
   .section-label { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--accent); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
   .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .sub-label { font-size: 11px; color: var(--accent); font-family: 'Space Mono', monospace; letter-spacing: 1px; margin-bottom: 8px; }
   .row { display: grid; gap: 12px; margin-bottom: 12px; }
   .row-2 { grid-template-columns: 1fr 1fr; }
   .row-3 { grid-template-columns: 1fr 1fr 1fr; }
@@ -52,6 +54,25 @@
   .bias-btn { padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; text-align: center; }
   .bias-btn.bull.active { background: var(--green-dim); border-color: var(--green); color: var(--green); }
   .bias-btn.bear.active { background: var(--red-dim); border-color: var(--red); color: var(--red); }
+  .toggle-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .str-btn { padding: 10px 6px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.2s; text-align: center; }
+  .str-btn.bull-active { background: var(--green-dim); border-color: var(--green); color: var(--green); }
+  .str-btn.bear-active { background: var(--red-dim); border-color: var(--red); color: var(--red); }
+  .str-btn.cons-active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+  .entry-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .entry-btn { padding: 14px 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; text-align: center; }
+  .entry-btn .entry-icon { font-size: 18px; display: block; margin-bottom: 4px; }
+  .entry-btn .entry-label { font-size: 11px; }
+  .entry-btn.sd-active { border-color: var(--accent); background: var(--accent-dim); color: var(--accent); }
+  .entry-btn.ema-active { border-color: var(--blue); background: var(--blue-dim); color: var(--blue); }
+  .entry-btn.liq-active { border-color: var(--purple); background: var(--purple-dim); color: var(--purple); }
+  .entry-btn.other-active { border-color: var(--green); background: var(--green-dim); color: var(--green); }
+  .outcome-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .outcome-btn { padding: 16px 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; text-align: center; }
+  .outcome-btn .o-icon { font-size: 20px; display: block; margin-bottom: 4px; }
+  .outcome-btn.win-active { border-color: var(--green); background: var(--green-dim); color: var(--green); }
+  .outcome-btn.loss-active { border-color: var(--red); background: var(--red-dim); color: var(--red); }
+  .outcome-btn.pending-active { border-color: var(--amber); background: var(--amber-dim); color: var(--amber); }
   .conf-block { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 14px; margin-bottom: 10px; }
   .conf-block:last-child { margin-bottom: 0; }
   .conf-num { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--accent); letter-spacing: 2px; margin-bottom: 10px; }
@@ -81,9 +102,10 @@
   .portal-footer { text-align: center; padding: 16px; font-size: 10px; color: var(--muted); border-top: 1px solid var(--border); margin-top: 40px; }
   @media (max-width: 600px) {
     .row-3, .row-4, .ma-grid { grid-template-columns: 1fr 1fr; }
-    .row-2 { grid-template-columns: 1fr; }
+    .row-2, .entry-grid { grid-template-columns: 1fr 1fr; }
     .mood-grid { grid-template-columns: repeat(3, 1fr); }
     .scale-grid { grid-template-columns: repeat(5, 1fr); }
+    .outcome-grid { grid-template-columns: 1fr 1fr 1fr; }
     .topbar { padding: 0 16px; }
     .main { padding: 24px 16px 60px; }
   }
@@ -137,6 +159,52 @@
       </div>
     </div>
 
+    <!-- MARKET STRUCTURE -->
+    <div class="section">
+      <div class="section-label">Market Structure</div>
+      <div class="row row-2">
+        <div class="field">
+          <div class="sub-label">📈 HTF — Higher Time Frame</div>
+          <div class="toggle-3">
+            <button class="str-btn" id="htf-bull" onclick="setStructure('htf','BULLISH')">🟢 Bullish</button>
+            <button class="str-btn" id="htf-bear" onclick="setStructure('htf','BEARISH')">🔴 Bearish</button>
+            <button class="str-btn" id="htf-cons" onclick="setStructure('htf','CONSOLIDATION')">🟡 Cons</button>
+          </div>
+        </div>
+        <div class="field">
+          <div class="sub-label">📉 LTF — Lower Time Frame</div>
+          <div class="toggle-3">
+            <button class="str-btn" id="ltf-bull" onclick="setStructure('ltf','BULLISH')">🟢 Bullish</button>
+            <button class="str-btn" id="ltf-bear" onclick="setStructure('ltf','BEARISH')">🔴 Bearish</button>
+            <button class="str-btn" id="ltf-cons" onclick="setStructure('ltf','CONSOLIDATION')">🟡 Cons</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENTRY TYPE -->
+    <div class="section">
+      <div class="section-label">Entry Type</div>
+      <div class="entry-grid">
+        <button class="entry-btn" id="entry-sd" onclick="setEntry('sd')">
+          <span class="entry-icon">📍</span>
+          <span class="entry-label">S&D + Fibs Entry</span>
+        </button>
+        <button class="entry-btn" id="entry-ema" onclick="setEntry('ema')">
+          <span class="entry-icon">📈</span>
+          <span class="entry-label">EMA Pullback Entry</span>
+        </button>
+        <button class="entry-btn" id="entry-liq" onclick="setEntry('liq')">
+          <span class="entry-icon">💧</span>
+          <span class="entry-label">Liquidity Sweep Entry</span>
+        </button>
+        <button class="entry-btn" id="entry-other" onclick="setEntry('other')">
+          <span class="entry-icon">⚙️</span>
+          <span class="entry-label">Other</span>
+        </button>
+      </div>
+    </div>
+
     <!-- PRIMARY ZONE -->
     <div class="section">
       <div class="section-label">Primary Zone</div>
@@ -161,6 +229,22 @@
       </div>
     </div>
 
+    <!-- TRADE OUTCOME -->
+    <div class="section">
+      <div class="section-label">Did Your Trade Play Out?</div>
+      <div class="outcome-grid">
+        <button class="outcome-btn" id="out-win" onclick="setOutcome('win')">
+          <span class="o-icon">✅</span>Played Out
+        </button>
+        <button class="outcome-btn" id="out-loss" onclick="setOutcome('loss')">
+          <span class="o-icon">❌</span>Stopped Out
+        </button>
+        <button class="outcome-btn" id="out-pending" onclick="setOutcome('pending')">
+          <span class="o-icon">⏳</span>Still Waiting
+        </button>
+      </div>
+    </div>
+
     <!-- CONFLUENCES -->
     <div class="section">
       <div class="section-label">Confluences</div>
@@ -172,7 +256,7 @@
               <option>—</option><option>Supply Zone</option><option>Demand Zone</option>
               <option>Imbalance</option><option>Support</option><option>Resistance</option>
               <option>Trendline</option><option>EMA</option><option>SMA</option>
-              <option>VWAP</option><option>Market Structure</option><option>Liquidity Sweep</option>
+              <option>VWAP</option><option>Market Structure</option><option>Liquidity Sweep</option><option>Fib</option>
             </select>
           </div>
           <div class="field"><label>Note</label><input type="text" id="conf1-note" placeholder="describe the confluence" /></div>
@@ -186,7 +270,7 @@
               <option>—</option><option>Supply Zone</option><option>Demand Zone</option>
               <option>Imbalance</option><option>Support</option><option>Resistance</option>
               <option>Trendline</option><option>EMA</option><option>SMA</option>
-              <option>VWAP</option><option>Market Structure</option><option>Liquidity Sweep</option>
+              <option>VWAP</option><option>Market Structure</option><option>Liquidity Sweep</option><option>Fib</option>
             </select>
           </div>
           <div class="field"><label>Note</label><input type="text" id="conf2-note" placeholder="optional" /></div>
@@ -200,7 +284,7 @@
               <option>—</option><option>Supply Zone</option><option>Demand Zone</option>
               <option>Imbalance</option><option>Support</option><option>Resistance</option>
               <option>Trendline</option><option>EMA</option><option>SMA</option>
-              <option>VWAP</option><option>Market Structure</option><option>Liquidity Sweep</option>
+              <option>VWAP</option><option>Market Structure</option><option>Liquidity Sweep</option><option>Fib</option>
             </select>
           </div>
           <div class="field"><label>Note</label><input type="text" id="conf3-note" placeholder="optional" /></div>
@@ -239,7 +323,6 @@
       <hr class="section-divider">
 
       <div class="section-label" style="margin-top:16px">Mental Note</div>
-
       <div class="field" style="margin-bottom:12px">
         <label>How are you feeling right now?</label>
         <div class="mood-grid">
@@ -250,7 +333,6 @@
           <button class="mood-btn" id="mood-focused" onclick="setMood('focused')">🔥 Focused</button>
         </div>
       </div>
-
       <div class="field" style="margin-bottom:12px">
         <label>Confidence Scale — 1 to 10</label>
         <div class="scale-grid">
@@ -266,7 +348,6 @@
           <button class="scale-btn" id="scale-10" onclick="setScale(10)">10</button>
         </div>
       </div>
-
       <div class="field">
         <label>Additional Thoughts</label>
         <textarea id="mental-note" placeholder="e.g. I feel hesitant because of news today, or I'm very confident in this setup..."></textarea>
@@ -308,6 +389,52 @@
 
   let currentBias = 'BULLISH';
   function setBias(b) { currentBias = b; document.getElementById('bull-btn').classList.toggle('active', b === 'BULLISH'); document.getElementById('bear-btn').classList.toggle('active', b === 'BEARISH'); }
+
+  let htfStructure = null;
+  let ltfStructure = null;
+  function setStructure(tf, val) {
+    const prefix = tf + '-';
+    ['bull','bear','cons'].forEach(k => document.getElementById(prefix+k).className = 'str-btn');
+    const current = tf === 'htf' ? htfStructure : ltfStructure;
+    if (current === val) { if (tf === 'htf') htfStructure = null; else ltfStructure = null; return; }
+    if (tf === 'htf') htfStructure = val; else ltfStructure = val;
+    const cls = val === 'BULLISH' ? 'bull-active' : val === 'BEARISH' ? 'bear-active' : 'cons-active';
+    const key = val === 'BULLISH' ? 'bull' : val === 'BEARISH' ? 'bear' : 'cons';
+    document.getElementById(prefix+key).classList.add(cls);
+  }
+  function getStructureEmoji(val) { return val === 'BULLISH' ? '🟢' : val === 'BEARISH' ? '🔴' : '🟡'; }
+  function buildStructureString() {
+    const htf = htfStructure ? `> 📈 HTF: ${getStructureEmoji(htfStructure)} ${htfStructure}` : '> 📈 HTF: —';
+    const ltf = ltfStructure ? `> 📉 LTF: ${getStructureEmoji(ltfStructure)} ${ltfStructure}` : '> 📉 LTF: —';
+    return `${htf}\n${ltf}`;
+  }
+
+  const entryTypes = {
+    sd:    { label: 'S&D + Fibs Entry',     cls: 'sd-active'    },
+    ema:   { label: 'EMA Pullback Entry',    cls: 'ema-active'   },
+    liq:   { label: 'Liquidity Sweep Entry', cls: 'liq-active'   },
+    other: { label: 'Other',                 cls: 'other-active' }
+  };
+  let currentEntry = null;
+  function setEntry(e) {
+    ['sd','ema','liq','other'].forEach(k => document.getElementById('entry-'+k).className = 'entry-btn');
+    if (currentEntry === e) { currentEntry = null; return; }
+    currentEntry = e;
+    document.getElementById('entry-'+e).classList.add(entryTypes[e].cls);
+  }
+
+  const outcomeConfig = {
+    win:     { label: '✅ Played Out',   cls: 'win-active'     },
+    loss:    { label: '❌ Stopped Out',  cls: 'loss-active'    },
+    pending: { label: '⏳ Still Waiting', cls: 'pending-active' }
+  };
+  let currentOutcome = null;
+  function setOutcome(o) {
+    ['win','loss','pending'].forEach(k => document.getElementById('out-'+k).className = 'outcome-btn');
+    if (currentOutcome === o) { currentOutcome = null; return; }
+    currentOutcome = o;
+    document.getElementById('out-'+o).classList.add(outcomeConfig[o].cls);
+  }
 
   let activeMA = new Set();
   function toggleMA(ma, type) { const btn = document.getElementById('ma-'+ma); const cls = type === 'ema' ? 'ema-active' : 'sma-active'; if (activeMA.has(ma)) { activeMA.delete(ma); btn.classList.remove(cls); } else { activeMA.add(ma); btn.classList.add(cls); } }
@@ -379,6 +506,10 @@
         body: JSON.stringify({
           username, symbol, timeframe, type,
           bias: currentBias,
+          htfStructure: htfStructure || '—',
+          ltfStructure: ltfStructure || '—',
+          entryType: currentEntry ? entryTypes[currentEntry].label : '—',
+          outcome: currentOutcome ? outcomeConfig[currentOutcome].label : '—',
           primaryZone, zoneRange,
           entry, sl, tp1, tp2, tp3,
           rr: calculatedRR,
