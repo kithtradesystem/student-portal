@@ -17,6 +17,8 @@ exports.handler = async function(event) {
     });
 
     const tp3Line = data.tp3 ? `\n> 🎯 Take Profit 3: \`${data.tp3}\`` : '';
+    const entryTag = data.entryType !== '—' ? `\`${data.entryType.toUpperCase()}\`\n\n` : '';
+    const outcomeEmoji = data.outcome.includes('Played') ? '✅' : data.outcome.includes('Stopped') ? '❌' : '⏳';
 
     const forumRes = await fetch(`https://discord.com/api/v10/channels/${channelId}/threads`, {
       method: 'POST',
@@ -32,8 +34,12 @@ exports.handler = async function(event) {
           embeds: [{
             title: `📊 ${data.symbol} | ${data.timeframe} | ${data.type}`,
             description:
-`👤 **Student:** ${data.username}
+`${entryTag}👤 **Student:** ${data.username}
 ${data.bias === 'BULLISH' ? '🟢' : '🔴'} **${data.bias} BIAS**
+
+**📊 Market Structure**
+> 📈 HTF: ${data.htfStructure !== '—' ? (data.htfStructure === 'BULLISH' ? '🟢' : data.htfStructure === 'BEARISH' ? '🔴' : '🟡') + ' ' + data.htfStructure : '—'}
+> 📉 LTF: ${data.ltfStructure !== '—' ? (data.ltfStructure === 'BULLISH' ? '🟢' : data.ltfStructure === 'BEARISH' ? '🔴' : '🟡') + ' ' + data.ltfStructure : '—'}
 
 **📍 Primary Zone — ${data.primaryZone}**
 > 🎯 Zone Range: \`${data.zoneRange || '—'}\`
@@ -54,6 +60,9 @@ ${data.mas || 'None'}
 
 **📖 What I See**
 ${data.analysis || '—'}
+
+**🏁 Trade Outcome**
+> ${outcomeEmoji} ${data.outcome}
 
 **🧠 Mental Note**
 > 😶 Mood: ${data.mood || '—'}
